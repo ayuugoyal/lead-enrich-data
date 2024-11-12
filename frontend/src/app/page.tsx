@@ -75,7 +75,7 @@ export default function Home() {
     setEnrichedData(null)
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/enrich', {
+      const response = await fetch('https://lead-enrich-data.onrender.com/api/enrich', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
