@@ -40,7 +40,8 @@ export default function Home() {
   const [enrichedData, setEnrichedData] = useState<EnrichedData | null>(null)
   const [isThereData, setIsThereData] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const [logoutError, setLogoutError] = useState<string | null>(null)
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -53,25 +54,26 @@ export default function Home() {
     try {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
-    } catch (loginError) {
-      setError('Failed to log in. Please try again.')
+    } catch (error) {
+      setLoginError('Failed to log in. Please try again.')
     }
   }
 
   const handleLogout = async () => {
     try {
-      setIsThereData(false)
-      setEnrichedData(null)
-      await auth.signOut()
-    } catch (logoutError) {
-      setError('Failed to log out. Please try again.')
+      setIsThereData(false);
+      setEnrichedData(null);
+      await auth.signOut();
+    } catch (error) {
+      setLogoutError('Failed to log out. Please try again.')
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
+    setLoginError(null)
+    setLogoutError(null)
     setEnrichedData(null)
 
     try {
@@ -91,9 +93,9 @@ export default function Home() {
       const data = await response.json()
       setEnrichedData(data)
       setIsThereData(true)
-    } catch (fetchError) {
-      console.error(fetchError)
-      setError(fetchError instanceof Error ? fetchError.message : 'An error occurred while fetching enriched data. Please try again.')
+    } catch (error) {
+      console.error(error)
+      setLoginError('An error occurred while fetching enriched data. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -155,9 +157,9 @@ export default function Home() {
               </Button>
             </>
           )}
-          {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
-          {isThereData ? (
-            enrichedData &&
+          {loginError && <p className="mt-4 text-red-500 text-center">{loginError}</p>}
+          {logoutError && <p className="mt-4 text-red-500 text-center">{logoutError}</p>}
+          {isThereData && enrichedData && (
             <Card className="mt-4">
               <CardHeader>
                 <CardTitle className="text-xl">Enriched Data</CardTitle>
@@ -203,7 +205,7 @@ export default function Home() {
                 </dl>
               </CardContent>
             </Card>
-          ) : null}
+          )}
         </CardContent>
       </Card>
     </div>
