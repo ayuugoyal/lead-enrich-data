@@ -55,6 +55,7 @@ export default function Home() {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
     } catch (error) {
+      console.error(error)
       setLoginError('Failed to log in. Please try again.')
     }
   }
@@ -65,6 +66,7 @@ export default function Home() {
       setEnrichedData(null);
       await auth.signOut();
     } catch (error) {
+      console.error(error)
       setLogoutError('Failed to log out. Please try again.')
     }
   }
@@ -159,6 +161,7 @@ export default function Home() {
           )}
           {loginError && <p className="mt-4 text-red-500 text-center">{loginError}</p>}
           {logoutError && <p className="mt-4 text-red-500 text-center">{logoutError}</p>}
+
           {isThereData && enrichedData && (
             <Card className="mt-4">
               <CardHeader>
