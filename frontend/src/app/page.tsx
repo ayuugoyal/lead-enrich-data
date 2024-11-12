@@ -53,17 +53,17 @@ export default function Home() {
     try {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
-    } catch (error) {
+    } catch (loginError) {
       setError('Failed to log in. Please try again.')
     }
   }
 
   const handleLogout = async () => {
     try {
-      setIsThereData(false);
-      setEnrichedData(null);
-      await auth.signOut();
-    } catch (error) {
+      setIsThereData(false)
+      setEnrichedData(null)
+      await auth.signOut()
+    } catch (logoutError) {
       setError('Failed to log out. Please try again.')
     }
   }
@@ -91,9 +91,9 @@ export default function Home() {
       const data = await response.json()
       setEnrichedData(data)
       setIsThereData(true)
-    } catch (error) {
-      console.error(error)
-      setError(error instanceof Error ? error.message : 'An error occurred while fetching enriched data. Please try again.')
+    } catch (fetchError) {
+      console.error(fetchError)
+      setError(fetchError instanceof Error ? fetchError.message : 'An error occurred while fetching enriched data. Please try again.')
     } finally {
       setLoading(false)
     }
