@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://lead-enrich-data.vercel.app", "http://localhost:3000"])
 
 api_key = os.getenv("GOOGLE_API_KEY")
 
@@ -55,7 +55,7 @@ def enrich_company_data():
         try:
             response_text = generated_text.strip()
             if response_text.startswith('```json'):
-                response_text = response_text[7:-3] 
+                response_text = response_text[7:-3]
             enriched_data = eval(response_text)
             return jsonify(enriched_data), 200
         except Exception as parse_error:
@@ -72,6 +72,12 @@ def enrich_company_data():
             "error": "Server error",
             "details": str(e)
         }), 500
+
+@app.after_request
+def apply_cors_headers(response):
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
