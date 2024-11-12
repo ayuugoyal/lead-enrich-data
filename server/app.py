@@ -4,13 +4,11 @@ from flask_cors import CORS
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# Get API key from environment variable
 api_key = os.getenv("GOOGLE_API_KEY")
 
 if not api_key:
@@ -19,7 +17,6 @@ if not api_key:
         "Get your API key from https://makersuite.google.com/app/apikey"
     )
 
-# Configure Google Generative AI with the API key
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-pro')
 
@@ -36,7 +33,6 @@ def enrich_company_data():
         if not company_name or not website:
             return jsonify({"error": "Both company name and website are required"}), 400
 
-        # Generate company information using Gemini
         prompt = f"""
         Generate a detailed company profile for {company_name} (website: {website}).
         Return the response in the following JSON format:
@@ -54,22 +50,23 @@ def enrich_company_data():
         """
         
         response = model.generate_content(prompt)
+        generated_text = response.text
         
-        # Parse the generated content
         try:
-            # Clean up the response text to ensure it's valid JSON
-            response_text = response.text.strip()
+            response_text = generated_text.strip()
             if response_text.startswith('```json'):
-                response_text = response_text[7:-3]  # Remove ```json and ``` markers
+                response_text = response_text[7:-3] 
             enriched_data = eval(response_text)
             return jsonify(enriched_data), 200
         except Exception as parse_error:
             return jsonify({
                 "error": "Failed to parse AI response",
                 "details": str(parse_error),
-                "raw_response": response.text
+                "raw_response": generated_text
             }), 500
 
+    except genai.types.generation_types.GenerationException as e:
+        return jsonify({"error": "AI model error", "details": str(e)}), 500
     except Exception as e:
         return jsonify({
             "error": "Server error",
