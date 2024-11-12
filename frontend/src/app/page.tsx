@@ -79,6 +79,8 @@ export default function Home() {
     setEnrichedData(null)
 
     try {
+      console.log('companyName:', companyName)
+      console.log('websiteUrl:', websiteUrl)
       const response = await fetch('https://lead-enrich-data.onrender.com/api/enrich', {
         method: 'POST',
         headers: {
@@ -86,6 +88,8 @@ export default function Home() {
         },
         body: JSON.stringify({ company_name: companyName, website: websiteUrl }),
       })
+
+      console.log('response:', response)
 
       if (!response.ok) {
         const errorData = await response.json()
